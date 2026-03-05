@@ -1,0 +1,20 @@
+# Binaries
+bin/
+
+# Build and test artifacts
+*.out
+*.test
+coverage.out
+
+# Go workspace files
+go.work
+go.work.sum
+
+# IDE/editor metadata
+.idea/
+.vscode/
+local/
+
+# OS files
+.DS_Store
+Thumbs.db

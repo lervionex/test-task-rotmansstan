@@ -1,0 +1,217 @@
+openapi: 3.0.3
+info:
+  title: Withdrawals Service API
+  version: 1.0.0
+  description: API for idempotent withdrawal creation and confirmation.
+servers:
+  - url: http://localhost:8080
+tags:
+  - name: Withdrawals
+  - name: Health
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Token
+  schemas:
+    CreateWithdrawalRequest:
+      type: object
+      required:
+        - user_id
+        - amount
+        - currency
+        - destination
+        - idempotency_key
+      properties:
+        user_id:
+          type: string
+          example: user-1
+        amount:
+          type: integer
+          format: int64
+          minimum: 1
+          example: 100
+        currency:
+          type: string
+          enum: [USDT]
+          example: USDT
+        destination:
+          type: string
+          example: wallet-abc
+        idempotency_key:
+          type: string
+          example: withdraw-001
+    Withdrawal:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 6d7489e0-9d70-4d24-947f-2d40a1dfd4d3
+        user_id:
+          type: string
+          example: user-1
+        amount:
+          type: integer
+          format: int64
+          example: 100
+        currency:
+          type: string
+          example: USDT
+        destination:
+          type: string
+          example: wallet-abc
+        status:
+          type: string
+          enum: [pending, confirmed]
+          example: pending
+        idempotency_key:
+          type: string
+          example: withdraw-001
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        confirmed_at:
+          type: string
+          format: date-time
+          nullable: true
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: insufficient balance
+security:
+  - BearerAuth: []
+paths:
+  /healthz:
+    get:
+      tags: [Health]
+      security: []
+      responses:
+        '200':
+          description: Liveness probe
+  /readyz:
+    get:
+      tags: [Health]
+      security: []
+      responses:
+        '200':
+          description: Readiness probe
+        '503':
+          description: Dependency is unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/withdrawals:
+    post:
+      tags: [Withdrawals]
+      summary: Create withdrawal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWithdrawalRequest'
+      responses:
+        '201':
+          description: Withdrawal created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Withdrawal'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Insufficient balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Idempotency key reused with different payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/withdrawals/{id}:
+    get:
+      tags: [Withdrawals]
+      summary: Get withdrawal by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Withdrawal details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Withdrawal'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/withdrawals/{id}/confirm:
+    post:
+      tags: [Withdrawals]
+      summary: Confirm withdrawal
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Confirmed withdrawal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Withdrawal'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
