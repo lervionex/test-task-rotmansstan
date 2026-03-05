@@ -2,6 +2,25 @@
 
 Сервис реализует безопасное создание заявок на вывод средств с идемпотентностью, защитой от двойного списания и подтверждением вывода.
 
+## Локальный запуск
+
+```bash
+docker compose up --build
+```
+
+Сервис будет доступен на `http://localhost:8080`.
+
+Переменные окружения API:
+
+- `DATABASE_URL`
+- `API_TOKEN`
+- `HTTP_ADDRESS` (по умолчанию `:8080`)
+
+В `docker-compose.yml` уже выставлены локальные значения:
+
+- токен: `local-dev-token`
+- база: `postgres://postgres:postgres@localhost:5432/withdrawals?sslmode=disable`
+
 ## Структура проекта
 
 - `cmd/api` содержит entrypoint приложения
@@ -83,25 +102,6 @@ Liveness probe без auth.
 ### `GET /readyz`
 
 Readiness probe без auth. Проверяет доступность PostgreSQL через `Ping`.
-
-## Локальный запуск
-
-```bash
-docker compose up --build
-```
-
-Сервис будет доступен на `http://localhost:8080`.
-
-Переменные окружения API:
-
-- `DATABASE_URL`
-- `API_TOKEN`
-- `HTTP_ADDRESS` (по умолчанию `:8080`)
-
-В `docker-compose.yml` уже выставлены локальные значения:
-
-- токен: `local-dev-token`
-- база: `postgres://postgres:postgres@localhost:5432/withdrawals?sslmode=disable`
 
 ## Пример вызова
 
