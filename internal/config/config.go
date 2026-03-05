@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-const defaultHTTPAddress = ":8080"
+const defaultHTTPAddress = ":18080"
 
 type Config struct {
 	HTTPAddress string

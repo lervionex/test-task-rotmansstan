@@ -8,18 +8,18 @@
 docker compose up --build
 ```
 
-Сервис будет доступен на `http://localhost:8080`.
+Сервис будет доступен на `http://localhost:18080`.
 
 Переменные окружения API:
 
 - `DATABASE_URL`
 - `API_TOKEN`
-- `HTTP_ADDRESS` (по умолчанию `:8080`)
+- `HTTP_ADDRESS` (по умолчанию `:18080`)
 
 В `docker-compose.yml` уже выставлены локальные значения:
 
 - токен: `local-dev-token`
-- база: `postgres://postgres:postgres@localhost:5432/withdrawals?sslmode=disable`
+- база: `postgres://postgres:postgres@localhost:15432/withdrawals?sslmode=disable`
 
 ## Структура проекта
 
@@ -106,7 +106,7 @@ Readiness probe без auth. Проверяет доступность PostgreSQ
 ## Пример вызова
 
 ```bash
-curl -X POST http://localhost:8080/v1/withdrawals \
+curl -X POST http://localhost:18080/v1/withdrawals \
   -H 'Authorization: Bearer local-dev-token' \
   -H 'Content-Type: application/json' \
   -d '{"user_id":"user-1","amount":100,"currency":"USDT","destination":"wallet-abc","idempotency_key":"withdraw-001"}'

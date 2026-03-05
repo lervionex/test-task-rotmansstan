@@ -14,6 +14,6 @@ WORKDIR /app
 
 COPY --from=builder /withdrawals-service /app/withdrawals-service
 
-EXPOSE 8080
+EXPOSE 18080
 
 ENTRYPOINT ["/app/withdrawals-service"]
